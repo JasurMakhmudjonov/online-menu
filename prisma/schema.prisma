@@ -1,0 +1,30 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Restaurants {
+  id      String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name    String
+  address String
+  foods   Foods[]
+
+  @@id([id])
+  @@unique([name, address])
+  @@map("restaurants")
+}
+
+model Foods {
+  id           String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  price        Float
+  restaurantId String      @db.Uuid
+  restaurant   Restaurants @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([id])
+  @@map("foods")
+}
